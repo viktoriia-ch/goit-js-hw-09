@@ -15,4 +15,44 @@ body {
 img {
   display: block;
   max-width: 100%;
+  flex-direction: column;
+}
+
+.timer {
+  display: flex;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 10px;
+}
+
+.value {
+  font-size: 30px;
+}
+
+.label {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.btn {
+  border: none;
+  padding: 4px 6px;
+  color: #fafafa;
+  text-transform: uppercase;
+  background-color: teal;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.btn:hover {
+  background-color: cadetblue;
+}
+
+.btn:disabled {
+  background-color: cadetblue;
 }
