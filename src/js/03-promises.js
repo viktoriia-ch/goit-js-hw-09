@@ -1,50 +1,60 @@
-import Notiflix from 'notiflix';
+import { Notify } from 'notiflix';
 
-let position = 0;
+const form = document.querySelector('.form');
+let position = 1;
 
-const refs = {
-  form: document.querySelector('.form'),
-};
+form.addEventListener('submit', onSubmitForm);
 
-refs.form.addEventListener('submit', onSubmitForm);
-
-function createPromise(position, delay) {
-  return new Promise((resolve, reject) => {
-    const shouldResolve = Math.random() > 0.5;
-
-    setTimeout(() => {
-      if (shouldResolve) {
-        resolve({ position, delay });
-      } else {
-        reject({ position, delay });
-      }
-    }, delay);
-  });
-}
-
+// FUNCTIONS
 function onSubmitForm(evt) {
   evt.preventDefault();
 
-  const delay = evt.target.delay.value;
-  const step = evt.target.step.value;
-  const amount = evt.target.amount.value;
+  const inputDelay = evt.target.delay.value;
+  const inputStep = evt.target.step.value;
+  const inputAmount = evt.target.amount.value;
 
-  const id = setInterval(() => {
+  setTimeout(() => {
+    createPromise(position, inputDelay).then(onSuccess).catch(onError);
+    onSetInterval(inputDelay, inputStep, inputAmount);
+  }, inputDelay);
+
+  position = 1;
+}
+
+function createPromise(position, delay) {
+  return new Promise((resolve, reject) => {
+    const shouldResolve = Math.random() > 0.3;
+
+    if (shouldResolve) {
+      resolve({ position, delay });
+    } else {
+      reject({ position, delay });
+    }
+  });
+}
+
+function onSetInterval(inputDelay, inputStep, inputAmount) {
+  let delay = Number(inputDelay);
+
+  const idInterval = setInterval(() => {
+    delay += Number(inputStep);
     position += 1;
-    if (position > amount) {
-      clearInterval(id);
+
+    if (position > inputAmount) {
+      clearInterval(idInterval);
       return;
     }
+
     createPromise(position, delay).then(onSuccess).catch(onError);
-  }, step);
+  }, inputStep);
 }
 
 function onSuccess({ position, delay }) {
-  console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
-  Notiflix.Notify.success(`Fulfilled promise ${position} in ${delay}ms`);
+  // console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
+  Notify.success(`Fulfilled promise ${position} in ${delay}ms`);
 }
 
 function onError({ position, delay }) {
-  console.log(`❌ Rejected promise ${position} in ${delay}ms`);
-  Notiflix.Notify.failure(`Rejected promise ${position} in ${delay}ms`);
+  // console.log(`❌ Rejected promise ${position} in ${delay}ms`);
+  Notify.failure(`Rejected promise ${position} in ${delay}ms`);
 }

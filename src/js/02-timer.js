@@ -5,14 +5,11 @@ import 'flatpickr/dist/flatpickr.min.css';
 const refs = {
   input: document.querySelector('#datetime-picker'),
   btnStart: document.querySelector('button[data-start]'),
-  timer: document.querySelector('.timer'),
-  field: document.querySelector('.field'),
   dataDays: document.querySelector('span[data-days]'),
   dataHour: document.querySelector('span[data-hours]'),
   dataMinutes: document.querySelector('span[data-minutes]'),
   dataSeconds: document.querySelector('span[data-seconds]'),
 };
-refs.btnStart.setAttribute('disabled', true);
 
 const options = {
   enableTime: true,
@@ -25,8 +22,6 @@ const options = {
       return;
     }
     refs.btnStart.removeAttribute('disabled');
-    // console.log(options.defaultDate.getTime());
-    // console.log(selectedDates[0].getTime());
   },
 };
 
@@ -34,10 +29,36 @@ const calendar = flatpickr('#datetime-picker', options);
 const KEY_DELAY = 1000;
 let isActive = false;
 
+setAttributeonBtn();
+
 // ADD EVENT LISTENERS
 refs.btnStart.addEventListener('click', onStartTimer);
 
 // FUNCTIONS
+function onStartTimer() {
+  const selectedDate = calendar.selectedDates[0].getTime();
+  if (isActive) {
+    return;
+  }
+
+  const idInterval = setInterval(() => {
+    isActive = true;
+    const currentDate = Date.now();
+    const deltaTime = selectedDate - currentDate;
+
+    if (deltaTime <= -1) {
+      clearInterval(idInterval);
+      isActive = false;
+      return;
+    }
+    const { days, hours, minutes, seconds } = convertMs(deltaTime);
+    update({ days, hours, minutes, seconds });
+  }, KEY_DELAY);
+}
+
+function setAttributeonBtn() {
+  refs.btnStart.setAttribute('disabled', true);
+}
 
 function update({ days, hours, minutes, seconds }) {
   refs.dataDays.textContent = days;
@@ -45,32 +66,6 @@ function update({ days, hours, minutes, seconds }) {
   refs.dataMinutes.textContent = minutes;
   refs.dataSeconds.textContent = seconds;
 }
-
-function onStartTimer() {
-  const startDate = calendar.selectedDates[0].getTime();
-  if (isActive) {
-    return;
-  }
-
-  const idInterval = setInterval(() => {
-    isActive = true;
-    const currentTime = new Date().getTime();
-    const deltaTime = startDate - currentTime;
-
-    if (deltaTime < -1) {
-      clearInterval(idInterval);
-      isActive = false;
-      return;
-    }
-    const { days, hours, minutes, seconds } = convertMs(deltaTime);
-    update({ days, hours, minutes, seconds });
-    // stopTimer(deltaTime, idInterval);
-  }, KEY_DELAY);
-}
-
-// function stopTimer(delta, id) {
-
-// }
 
 function addLeadingZero(value) {
   return String(value).padStart(2, '0');
